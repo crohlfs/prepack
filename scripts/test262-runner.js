@@ -1359,9 +1359,6 @@ function testFilterByMetadata(test: TestFileInfo): boolean {
   if (test.location.includes("U180") || test.location.includes("u180") || test.location.includes("mongolian"))
     return false;
 
-  // disable function toString tests.
-  if (test.location.includes("Function/prototype/toString")) return false;
-
   // disable tests that check for detached-buffer-after-toindex
   if (test.location.includes("detached-buffer-after-toindex")) return false;
 
@@ -1420,7 +1417,6 @@ function filterFeatures(data: BannerData): boolean {
   if (features.includes("BigInt")) return false;
   if (features.includes("class-fields")) return false;
   if (features.includes("async-iteration")) return false;
-  if (features.includes("Function.prototype.toString")) return false;
   if (features.includes("SharedArrayBuffer")) return false;
   if (features.includes("cross-realm")) return false;
   if (features.includes("atomics")) return false;

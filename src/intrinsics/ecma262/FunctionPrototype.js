@@ -22,6 +22,7 @@ import {
   StringValue,
   UndefinedValue,
   Value,
+  ECMAScriptSourceFunctionValue,
 } from "../../values/index.js";
 import { Call } from "../../methods/call.js";
 import { Create, To } from "../../singletons.js";
@@ -31,6 +32,8 @@ import { HasOwnProperty, HasSomeCompatibleType } from "../../methods/has.js";
 import { OrdinaryHasInstance } from "../../methods/abstract.js";
 import invariant from "../../invariant.js";
 import { PropertyDescriptor } from "../../descriptors.js";
+import { functionDeclaration, arrowFunctionExpression } from "@babel/types";
+import generate from "@babel/generator";
 
 export default function(realm: Realm, obj: ObjectValue): void {
   // ECMA262 19.2.3
@@ -225,6 +228,14 @@ export default function(realm: Realm, obj: ObjectValue): void {
         invariant(typeof name === "string");
         return new StringValue(realm, `function ${name}() { [native code] }`);
       }
+    } else if (context instanceof ECMAScriptSourceFunctionValue) {
+      let contextName = context.name;
+      let name = contextName instanceof AbstractValue ? undefined : contextName;
+
+      invariant(name === undefined || typeof name === "string");
+      let node = functionDeclaration(name, context.$FormalParameters, context.$ECMAScriptCode);
+
+      return new StringValue(realm, generate(node).code);
     } else if (context instanceof FunctionValue) {
       // TODO #1009: provide function source code
       return new StringValue(realm, "function () { }");
